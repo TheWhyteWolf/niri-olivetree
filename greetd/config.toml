@@ -1,0 +1,13 @@
+# greetd — console login manager (installed to /etc/greetd/config.toml by
+# greeter-install.sh). Runs tuigreet on vt1; sessions from wayland-sessions,
+# default niri-session, remembered per user.
+#
+# Theme is the olive rice mapped onto the VT's 16-colour palette (tuigreet
+# can't do hex): green = accent, gray = text, darkgray = border.
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --cmd niri-session --sessions /usr/share/wayland-sessions --remember --remember-user-session --asterisks --time --greeting 'niri-olivetree' --theme 'container=black;border=darkgray;title=green;greet=green;prompt=green;input=gray;text=gray;time=darkgray;action=gray;button=green' --power-shutdown 'systemctl poweroff' --power-reboot 'systemctl reboot'"
+user = "greeter"

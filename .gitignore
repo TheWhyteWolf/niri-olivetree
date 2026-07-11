@@ -1,0 +1,11 @@
+# Rust build artifacts
+lifewall/target/
+
+# Archives
+*.zip
+*.7z
+*.tar
+*.tar.*
+
+# Python bytecode
+__pycache__/

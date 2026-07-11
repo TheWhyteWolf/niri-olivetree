@@ -1,0 +1,13 @@
+[package]
+name = "lifewall"
+version = "0.1.0"
+edition = "2021"
+description = "Conway's Game of Life as a smooth terminal wallpaper (run it inside `kitten panel --edge=background`)"
+license = "MIT"
+
+[dependencies]
+libc = "0.2"
+
+[profile.release]
+lto = true
+strip = true

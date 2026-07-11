@@ -1,0 +1,78 @@
+/* Minimal muted-olive waybar
+   bg #121412 · text #7b8c5a · accent #a4c94b · border #39412b · urgent #8a3b2e */
+
+* {
+  font-family: "Cousine Nerd Font", "GoMono Nerd Font", "NotoSansM Nerd Font", monospace;
+  font-size: 12px;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+}
+
+window#waybar {
+  background: #121412;
+  color: #7b8c5a;
+  border-bottom: 1px solid #39412b;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  margin: 0;
+  color: #7b8c5a;
+  background: transparent;
+  box-shadow: none;
+}
+
+#workspaces button.active {
+  color: #a4c94b;
+  box-shadow: inset 0 -2px #a4c94b;
+}
+
+#workspaces button.urgent {
+  color: #8a3b2e;
+}
+
+#workspaces button:hover {
+  color: #a4c94b;
+  background: #171a14;
+}
+
+#window,
+#clock,
+#pulseaudio,
+#backlight,
+#battery,
+#cpu,
+#memory,
+#tray {
+  padding: 0 10px;
+  color: #7b8c5a;
+}
+
+#clock {
+  color: #a4c94b;
+}
+
+#pulseaudio.muted {
+  color: #8a3b2e;
+}
+
+/* Laptop modules (ignored on a desktop bar). */
+#battery.charging,
+#battery.plugged {
+  color: #a4c94b;
+}
+
+#battery.warning {
+  color: #c7d17a;
+}
+
+#battery.critical {
+  color: #8a3b2e;
+}
+
+tooltip {
+  background: #171a14;
+  border: 1px solid #39412b;
+  color: #7b8c5a;
+}
