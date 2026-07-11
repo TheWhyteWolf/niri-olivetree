@@ -1,0 +1,255 @@
+// niri-olivetree — a minimal, muted, olive-green niri rice.
+// Symlinked to ~/.config/niri/config.kdl by install.sh.
+//
+// Palette:
+//   bg #121412 · panel #171a14 · border #39412b · text #7b8c5a · accent #a4c94b
+//
+// niri docs: https://yalter.github.io/niri/
+
+input {
+    keyboard {
+        // No xkb block: your system keyboard layout applies as-is.
+    }
+
+    touchpad {
+        tap
+        // natural-scroll   // uncomment if you like macOS-style scrolling
+        dwt                 // disable-while-typing
+    }
+
+    mouse {}
+
+    // Uncomment to focus windows/outputs by moving the mouse into them:
+    // focus-follows-mouse max-scroll-amount="0%"
+}
+
+// Outputs are auto-detected. To pin a monitor, run `niri msg outputs` and add:
+// output "HDMI-A-1" {
+//     mode "1920x1080@60"
+//     scale 1
+// }
+
+layout {
+    gaps 12
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    // Muted-olive look: thin, always-on olive border; no focus ring.
+    // Dim olive at rest, bright lime-olive accent on the focused window.
+    focus-ring {
+        off
+    }
+    border {
+        width 2
+        active-color "#a4c94b"
+        inactive-color "#39412b"
+        urgent-color "#8a3b2e"
+    }
+
+    // Shadows off (minimal).
+    shadow {
+    }
+
+    struts {}
+}
+
+// Ask clients to omit client-side decorations -> sharp corners + niri-drawn borders.
+prefer-no-csd
+
+// Qt apps follow qt6ct (Fusion + dark palette; see qt6ct/qt6ct.conf).
+environment {
+    QT_QPA_PLATFORMTHEME "qt6ct"
+}
+
+// Cursor: phinger (light variant — visible on the dark backdrop).
+// niri exports XCURSOR_THEME/XCURSOR_SIZE to spawned apps; install.sh sets GTK to match.
+cursor {
+    xcursor-theme "phinger-cursors-light"
+    xcursor-size 24
+}
+
+// Dark-olive backdrop behind the overview / empty workspaces.
+overview {
+    backdrop-color "#0d0f0d"
+}
+
+// --- Startup ---
+// swaybg stays as a solid-colour fallback beneath the Game of Life panel.
+spawn-at-startup "swaybg" "-c" "#121412"
+// Conway's Game of Life wallpaper: kitty panel on the background layer.
+// lifebg -> lifewall (rust, 30 fps) or scripts/life.py fallback; see install.sh.
+// --config NONE so it ignores kitty.conf (rice.conf transparency etc.).
+spawn-sh-at-startup "kitten panel --edge=background --config NONE -o font_size=8 -o font_family='Cousine Nerd Font' -o background='#121412' ~/.local/bin/lifebg"
+// Idle chain: lock at 10 min, screens off at 15 min; lock before system sleep.
+spawn-at-startup "swayidle" "-w" "timeout" "600" "swaylock -f" "timeout" "900" "niri msg action power-off-monitors" "lock" "swaylock -f" "before-sleep" "swaylock -f"
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+// Clipboard-history watchers (cliphist).
+spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
+// Note: xwayland-satellite is auto-managed by niri >= 25.05 once the binary is installed.
+
+hotkey-overlay {
+    // skip-at-startup
+}
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+animations {
+    // Crisper, less floaty (1.0 = niri default speed; lower = faster).
+    slowdown 0.6
+}
+
+// --- Window rules ---
+window-rule {
+    // Firefox picture-in-picture floats.
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+window-rule {
+    // Dim unfocused windows slightly; makes the lime focus border pop.
+    match is-focused=false
+    opacity 0.95
+}
+
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    // --- Applications ---
+    Mod+Return hotkey-overlay-title="Launcher: fuzzel"       { spawn "fuzzel"; }
+    Mod+T      hotkey-overlay-title="Terminal: kitty"        { spawn "kitty"; }
+    Mod+D      hotkey-overlay-title="Launcher: fuzzel"       { spawn "fuzzel"; }
+    Mod+Space  hotkey-overlay-title="Launcher: fuzzel"       { spawn "fuzzel"; }
+    Mod+P      hotkey-overlay-title="Clipboard history"      { spawn-sh "~/.local/bin/clip-menu.sh"; }
+
+    // Screen lock (swayidle listens for the logind lock signal -> swaylock).
+    Mod+Alt+L { spawn "loginctl" "lock-session"; }
+
+    // --- Volume ---
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05+ -l 1.0"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05-"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute   @DEFAULT_AUDIO_SOURCE@ toggle"; }
+
+    // --- Backlight (laptops; needs brightnessctl + the video group or its udev rules) ---
+    XF86MonBrightnessUp   allow-when-locked=true { spawn-sh "brightnessctl set 5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn-sh "brightnessctl set 5%-"; }
+
+    // --- Window management ---
+    Mod+O repeat=false { toggle-overview; }
+    Mod+Q repeat=false { close-window; }
+
+    Mod+Left  { focus-column-left; }
+    Mod+Down  { focus-window-down; }
+    Mod+Up    { focus-window-up; }
+    Mod+Right { focus-column-right; }
+    Mod+H     { focus-column-left; }
+    Mod+J     { focus-window-down; }
+    Mod+K     { focus-window-up; }
+    Mod+L     { focus-column-right; }
+
+    Mod+Ctrl+Left  { move-column-left; }
+    Mod+Ctrl+Down  { move-window-down; }
+    Mod+Ctrl+Up    { move-window-up; }
+    Mod+Ctrl+Right { move-column-right; }
+    Mod+Ctrl+H     { move-column-left; }
+    Mod+Ctrl+J     { move-window-down; }
+    Mod+Ctrl+K     { move-window-up; }
+    Mod+Ctrl+L     { move-column-right; }
+
+    Mod+Home      { focus-column-first; }
+    Mod+End       { focus-column-last; }
+    Mod+Ctrl+Home { move-column-to-first; }
+    Mod+Ctrl+End  { move-column-to-last; }
+
+    // --- Monitors ---
+    Mod+Shift+Left  { focus-monitor-left; }
+    Mod+Shift+Down  { focus-monitor-down; }
+    Mod+Shift+Up    { focus-monitor-up; }
+    Mod+Shift+Right { focus-monitor-right; }
+
+    // --- Workspaces ---
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Page_Up   { focus-workspace-up; }
+    Mod+U         { focus-workspace-down; }
+    Mod+I         { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
+    Mod+Ctrl+U         { move-column-to-workspace-down; }
+    Mod+Ctrl+I         { move-column-to-workspace-up; }
+
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+
+    // --- Columns ---
+    Mod+BracketLeft  { consume-or-expel-window-left; }
+    Mod+BracketRight { consume-or-expel-window-right; }
+    Mod+Comma  { consume-window-into-column; }
+    Mod+Period { expel-window-from-column; }
+
+    Mod+R       { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-column-width-back; }
+    Mod+Ctrl+R  { reset-window-height; }
+
+    Mod+F       { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+M       { maximize-window-to-edges; }
+    Mod+Ctrl+F  { expand-column-to-available-width; }
+    Mod+C       { center-column; }
+
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    Mod+V       { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+W       { toggle-column-tabbed-display; }
+
+    // --- Screenshots ---
+    Print      { screenshot; }
+    Ctrl+Print { screenshot-screen; }
+    Alt+Print  { screenshot-window; }
+
+    // Escape hatch for shortcut inhibitors (e.g. remote-desktop clients).
+    Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+
+    // --- Session ---
+    // Power menu (lock/suspend/logout/reboot/poweroff — fuzzel, olive-styled).
+    Mod+Shift+E hotkey-overlay-title="Power menu" { spawn-sh "~/.local/bin/power-menu.sh"; }
+    Ctrl+Alt+Delete { quit; }
+    Mod+Shift+P     { power-off-monitors; }
+
+    // Pause/resume the Game of Life wallpaper (zero CPU while paused).
+    Mod+Shift+G hotkey-overlay-title="Pause wallpaper" { spawn-sh "~/.local/bin/lifebg-toggle.sh"; }
+    // Reset it: crossfade into a fresh soup (SIGUSR1; queues if paused).
+    // The pattern must not catch the kitty panel (its cmdline ends in bin/lifebg too).
+    Mod+Ctrl+G hotkey-overlay-title="Reset wallpaper" { spawn-sh "pkill -USR1 -f '^(python[0-9.]* )?[^ ]*bin/lifebg( |$)'"; }
+}

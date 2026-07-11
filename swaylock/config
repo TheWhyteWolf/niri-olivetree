@@ -1,0 +1,35 @@
+# Minimal muted-olive swaylock
+# Palette: bg #121412 · panel #171a14 · border #39412b · text #7b8c5a · accent #a4c94b
+# Invoked by swayidle (idle timeout / loginctl lock-session) and Mod+Alt+L.
+
+ignore-empty-password
+show-failed-attempts
+indicator-radius=90
+indicator-thickness=8
+font=Cousine Nerd Font
+
+color=121412
+
+inside-color=171a14
+inside-clear-color=171a14
+inside-ver-color=171a14
+inside-wrong-color=171a14
+
+ring-color=39412b
+ring-clear-color=7b8c5a
+ring-ver-color=a4c94b
+ring-wrong-color=8a3b2e
+
+line-color=121412
+line-clear-color=121412
+line-ver-color=121412
+line-wrong-color=121412
+
+key-hl-color=a4c94b
+bs-hl-color=8a3b2e
+separator-color=121412
+
+text-color=7b8c5a
+text-clear-color=7b8c5a
+text-ver-color=a4c94b
+text-wrong-color=8a3b2e

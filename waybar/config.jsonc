@@ -1,0 +1,67 @@
+{
+  // Thin, minimal, muted-olive top bar for niri.
+  "layer": "top",
+  "position": "top",
+  "height": 26,
+  "spacing": 6,
+
+  "modules-left": ["niri/workspaces", "niri/window"],
+  "modules-center": ["clock"],
+  // Desktop-friendly defaults; battery only shows where one exists.
+  // On a laptop, add "backlight" before "pulseaudio" (styles are already in style.css).
+  "modules-right": ["pulseaudio", "battery", "cpu", "memory", "tray"],
+
+  "niri/workspaces": {
+    "format": "{index}"
+  },
+
+  "niri/window": {
+    "format": "{title}",
+    "max-length": 60,
+    "separate-outputs": true
+  },
+
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+
+  "pulseaudio": {
+    "format": "VOL {volume}%",
+    "format-muted": "MUTE",
+    "scroll-step": 5,
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "backlight": {
+    "format": "BRT {percent}%",
+    "on-scroll-up": "brightnessctl set 5%+",
+    "on-scroll-down": "brightnessctl set 5%-"
+  },
+
+  "battery": {
+    "interval": 30,
+    "states": {
+      "warning": 20,
+      "critical": 10
+    },
+    "format": "BAT {capacity}%",
+    "format-charging": "CHG {capacity}%",
+    "format-plugged": "AC {capacity}%",
+    "tooltip-format": "{timeTo} · {power}W"
+  },
+
+  "cpu": {
+    "interval": 5,
+    "format": "CPU {usage}%"
+  },
+
+  "memory": {
+    "interval": 5,
+    "format": "MEM {percentage}%"
+  },
+
+  "tray": {
+    "spacing": 8
+  }
+}
