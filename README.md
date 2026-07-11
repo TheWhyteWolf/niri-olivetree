@@ -6,7 +6,15 @@ wallpaper**, an olive **tuigreet login screen**, and the whole desktop
 (bar, launcher, notifications, lock screen, terminal, GTK/Qt apps) pulled onto
 one quiet palette.
 
-> **Screenshots coming — drop yours in `assets/` and PR them!**
+## Screenshots
+
+![The desktop at rest — the Game of Life wallpaper under the waybar](assets/lifewall.png)
+*At rest: Conway's Game of Life drifting across the moss-black background in
+olive `#` glyphs, under the 26 px bar.*
+
+![A working session — transparent terminals over the wallpaper](assets/terminal-view.png)
+*At work: shell, file manager and [termusic](https://github.com/tramhao/termusic)
+in kitty panes, with the colonies ghosting through the 7% transparency.*
 
 ## Palette
 
