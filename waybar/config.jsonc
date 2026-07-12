@@ -7,9 +7,29 @@
 
   "modules-left": ["niri/workspaces", "niri/window"],
   "modules-center": ["clock"],
-  // Desktop-friendly defaults; battery only shows where one exists.
-  // On a laptop, add "backlight" before "pulseaudio" (styles are already in style.css).
-  "modules-right": ["pulseaudio", "battery", "cpu", "memory", "tray"],
+  // Pure-text policy: no glyph icons — labels only (DND/NET/VOL/CPU/MEM).
+  // battery only shows where one exists; on a laptop, add "backlight" before
+  // "pulseaudio" (styles are already in style.css).
+  "modules-right": ["custom/dnd", "network", "pulseaudio", "battery", "cpu", "memory", "tray"],
+
+  // Shows DND only while mako's do-not-disturb mode is on; click (or Mod+N)
+  // toggles it. dnd-toggle.sh pings signal 8 so the label updates instantly.
+  "custom/dnd": {
+    "exec": "makoctl mode 2>/dev/null | grep -qx 'do-not-disturb' && echo DND || echo ''",
+    "interval": "once",
+    "signal": 8,
+    "format": "{}",
+    "tooltip": false,
+    "on-click": "~/.local/bin/dnd-toggle.sh"
+  },
+
+  "network": {
+    "format-ethernet": "NET",
+    "format-wifi": "NET {signalStrength}%",
+    "format-disconnected": "NET --",
+    "tooltip-format": "{ifname}  {ipaddr}/{cidr}  via {gwaddr}",
+    "tooltip-format-disconnected": "no connection"
+  },
 
   "niri/workspaces": {
     "format": "{index}"
@@ -30,6 +50,7 @@
     "format": "VOL {volume}%",
     "format-muted": "MUTE",
     "scroll-step": 5,
+    "tooltip-format": "{desc}",
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
   },
 
@@ -53,15 +74,21 @@
 
   "cpu": {
     "interval": 5,
-    "format": "CPU {usage}%"
+    "format": "CPU {usage}%",
+    "states": { "warning": 70, "critical": 90 },
+    "on-click": "kitty -e htop"
   },
 
   "memory": {
     "interval": 5,
-    "format": "MEM {percentage}%"
+    "format": "MEM {percentage}%",
+    "states": { "warning": 70, "critical": 90 },
+    "tooltip-format": "{used:0.1f} / {total:0.1f} GiB",
+    "on-click": "kitty -e htop"
   },
 
   "tray": {
-    "spacing": 8
+    "spacing": 8,
+    "icon-size": 16
   }
 }

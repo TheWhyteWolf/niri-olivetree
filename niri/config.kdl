@@ -85,11 +85,14 @@ spawn-at-startup "swaybg" "-c" "#121412"
 // Conway's Game of Life wallpaper: kitty panel on the background layer.
 // lifebg -> lifewall (rust, 30 fps) or scripts/life.py fallback; see install.sh.
 // --config NONE so it ignores kitty.conf (rice.conf transparency etc.).
-spawn-sh-at-startup "kitten panel --edge=background --config NONE -o font_size=8 -o font_family='Cousine Nerd Font' -o background='#121412' ~/.local/bin/lifebg"
+spawn-sh-at-startup "kitten panel --edge=background --config NONE -o font_size=8 -o font_family='ShureTechMono Nerd Font' -o background='#121412' ~/.local/bin/lifebg"
 // Idle chain: lock at 10 min, screens off at 15 min; lock before system sleep.
 spawn-at-startup "swayidle" "-w" "timeout" "600" "swaylock -f" "timeout" "900" "niri msg action power-off-monitors" "lock" "swaylock -f" "before-sleep" "swaylock -f"
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
+// Volume/brightness OSD: wob draws a bar for whatever percentage lands in its
+// FIFO (vol-osd.sh / bright-osd.sh write there). Olive-themed via wob/wob.ini.
+spawn-sh-at-startup "f=$XDG_RUNTIME_DIR/wob.sock; rm -f $f; mkfifo $f; tail -f $f | wob"
 // Clipboard-history watchers (cliphist).
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
@@ -155,15 +158,20 @@ binds {
     // On Mod+Alt+Escape to leave Mod+Alt+L free for the float-snap mirror.
     Mod+Alt+Escape { spawn "loginctl" "lock-session"; }
 
-    // --- Volume ---
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05+ -l 1.0"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05-"; }
-    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute   @DEFAULT_AUDIO_SOURCE@ toggle"; }
+    // --- Volume (vol-osd.sh = wpctl + a wob OSD bar flash) ---
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "~/.local/bin/vol-osd.sh up"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "~/.local/bin/vol-osd.sh down"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "~/.local/bin/vol-osd.sh mute"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
 
-    // --- Backlight (laptops; needs brightnessctl + the video group or its udev rules) ---
-    XF86MonBrightnessUp   allow-when-locked=true { spawn-sh "brightnessctl set 5%+"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn-sh "brightnessctl set 5%-"; }
+    // --- Backlight (laptops; bright-osd.sh = brightnessctl + a wob flash;
+    //     needs the video group or brightnessctl's udev rules) ---
+    XF86MonBrightnessUp   allow-when-locked=true { spawn-sh "~/.local/bin/bright-osd.sh up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn-sh "~/.local/bin/bright-osd.sh down"; }
+
+    // --- Notifications ---
+    // Do-not-disturb toggle (mako mode; the waybar DND label mirrors it).
+    Mod+N hotkey-overlay-title="Do not disturb" { spawn-sh "~/.local/bin/dnd-toggle.sh"; }
 
     // --- Window management ---
     Mod+O repeat=false { toggle-overview; }

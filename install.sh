@@ -7,9 +7,9 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Official repos:
-PKGS=(niri kitty fuzzel waybar mako swaybg xwayland-satellite wl-clipboard cliphist jq
+PKGS=(niri kitty fuzzel waybar mako swaybg xwayland-satellite wl-clipboard cliphist jq wob
       swaylock swayidle brightnessctl adw-gtk-theme
-      ttf-cousine-nerd xdg-desktop-portal-gtk xdg-desktop-portal-gnome qt6ct)
+      ttf-sharetech-mono-nerd ttf-cousine-nerd xdg-desktop-portal-gtk xdg-desktop-portal-gnome qt6ct)
 # AUR (cursor theme):
 AUR_PKGS=(phinger-cursors)
 
@@ -43,6 +43,8 @@ link "$REPO/waybar/style.css"    "$HOME/.config/waybar/style.css"
 link "$REPO/fuzzel/fuzzel.ini"   "$HOME/.config/fuzzel/fuzzel.ini"
 link "$REPO/mako/config"         "$HOME/.config/mako/config"
 link "$REPO/kitty/rice.conf"     "$HOME/.config/kitty/rice.conf"
+link "$REPO/kitty/olive.conf"    "$HOME/.config/kitty/olive.conf"
+link "$REPO/wob/wob.ini"         "$HOME/.config/wob/wob.ini"
 link "$REPO/swaylock/config"     "$HOME/.config/swaylock/config"
 link "$REPO/xdg/portals.conf"    "$HOME/.config/xdg-desktop-portal/portals.conf"
 link "$REPO/qt6ct/qt6ct.conf"    "$HOME/.config/qt6ct/qt6ct.conf"
@@ -58,13 +60,17 @@ fi
 echo "==> Installing scripts into ~/.local/bin"
 chmod +x "$REPO/scripts/clip-menu.sh" "$REPO/scripts/life.py" \
          "$REPO/scripts/power-menu.sh" "$REPO/scripts/lifebg-toggle.sh" \
-         "$REPO/scripts/float-snap.sh" "$REPO/scripts/scratch-term.sh"
+         "$REPO/scripts/float-snap.sh" "$REPO/scripts/scratch-term.sh" \
+         "$REPO/scripts/vol-osd.sh" "$REPO/scripts/bright-osd.sh" "$REPO/scripts/dnd-toggle.sh"
 mkdir -p "$HOME/.local/bin"
 ln -sfn "$REPO/scripts/clip-menu.sh"     "$HOME/.local/bin/clip-menu.sh"
 ln -sfn "$REPO/scripts/power-menu.sh"    "$HOME/.local/bin/power-menu.sh"
 ln -sfn "$REPO/scripts/lifebg-toggle.sh" "$HOME/.local/bin/lifebg-toggle.sh"
 ln -sfn "$REPO/scripts/float-snap.sh"    "$HOME/.local/bin/float-snap.sh"
 ln -sfn "$REPO/scripts/scratch-term.sh"  "$HOME/.local/bin/scratch-term.sh"
+ln -sfn "$REPO/scripts/vol-osd.sh"       "$HOME/.local/bin/vol-osd.sh"
+ln -sfn "$REPO/scripts/bright-osd.sh"    "$HOME/.local/bin/bright-osd.sh"
+ln -sfn "$REPO/scripts/dnd-toggle.sh"    "$HOME/.local/bin/dnd-toggle.sh"
 
 echo "==> Game of Life wallpaper (~/.local/bin/lifebg)"
 if command -v cargo >/dev/null 2>&1; then
@@ -94,10 +100,10 @@ cat <<'EOF'
       Pause/resume: Mod+Shift+G · fresh soup: Mod+Ctrl+G · flags: `lifebg --help`
     - Lock: Mod+Alt+Escape (or 10 min idle); screens off at 15 min.
     - Float snap: Mod+Alt+arrows (or H/J/K/L) · dropdown terminal: Mod+Grave.
+    - Volume/brightness keys flash a wob OSD bar · do-not-disturb: Mod+N.
     - Power menu: Mod+Shift+E · clipboard history: Mod+P · launcher: Mod+Space.
-    - Restart kitty windows to pick up the transparency + font (rice.conf).
-    - Kitty olive colours are opt-in: `kitty -c ~/.config/kitty/olive.conf` to
-      preview, then `include olive.conf` in your kitty.conf to adopt.
+    - Restart kitty windows to pick up the transparency + font + olive palette
+      (rice.conf now includes olive.conf).
     - Optional olive login screen (replaces your display manager — deliberate step):
         bash greeter-install.sh
 EOF

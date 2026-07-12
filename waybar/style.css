@@ -2,7 +2,7 @@
    bg #121412 · text #7b8c5a · accent #a4c94b · border #39412b · urgent #8a3b2e */
 
 * {
-  font-family: "Cousine Nerd Font", "GoMono Nerd Font", "NotoSansM Nerd Font", monospace;
+  font-family: "ShureTechMono Nerd Font", "GoMono Nerd Font", "NotoSansM Nerd Font", monospace;
   font-size: 12px;
   min-height: 0;
   border: none;
@@ -39,6 +39,8 @@ window#waybar {
 
 #window,
 #clock,
+#custom-dnd,
+#network,
 #pulseaudio,
 #backlight,
 #battery,
@@ -51,6 +53,22 @@ window#waybar {
 
 #clock {
   color: #a4c94b;
+}
+
+/* Do-not-disturb label — only present while the mode is on. */
+#custom-dnd {
+  color: #c7d17a;
+}
+
+/* CPU/MEM load thresholds. */
+#cpu.warning,
+#memory.warning {
+  color: #c7d17a;
+}
+
+#cpu.critical,
+#memory.critical {
+  color: #8a3b2e;
 }
 
 #pulseaudio.muted {

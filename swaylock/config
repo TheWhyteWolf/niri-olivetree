@@ -6,7 +6,7 @@ ignore-empty-password
 show-failed-attempts
 indicator-radius=90
 indicator-thickness=8
-font=Cousine Nerd Font
+font=ShureTechMono Nerd Font
 
 color=121412
 

@@ -7,13 +7,15 @@ border-color=#39412b
 progress-color=over #39412b
 border-size=1
 border-radius=0
-font=Cousine Nerd Font 11
+font=ShureTechMono Nerd Font 11
 padding=10
 margin=8
 default-timeout=5000
 anchor=top-right
 max-visible=5
 width=340
+# Pure-text rice: no notification icons.
+icons=0
 
 [urgency=low]
 border-color=#39412b
@@ -25,3 +27,8 @@ border-color=#39412b
 border-color=#8a3b2e
 text-color=#a4c94b
 default-timeout=0
+
+# Do-not-disturb (toggled by Mod+N / the waybar DND label via dnd-toggle.sh):
+# swallow every notification while active; they stay in `makoctl history`.
+[mode=do-not-disturb]
+invisible=1
