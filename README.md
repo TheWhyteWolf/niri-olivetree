@@ -8,18 +8,6 @@ one quiet palette.
 
 ## Screenshots
 
-![The desktop at rest — the Game of Life wallpaper under the waybar](assets/lifewall.png)
-*At rest: Conway's Game of Life drifting across the moss-black background in
-olive `#` glyphs, under the 26 px bar.*
-
-![A working session — transparent terminals over the wallpaper](assets/terminal-view.png)
-*At work: shell, file manager and [termusic](https://github.com/tramhao/termusic)
-in kitty panes, with the colonies ghosting through the 7% transparency.*
-
-![Desktop — fastfetch over the wallpaper](assets/desktop.png)
-*System at a glance: fastfetch over the colonies, everything on the olive palette.*
-
-The rest of the setup:
 
 | | |
 |---|---|
