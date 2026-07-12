@@ -2,8 +2,8 @@
 
 A minimal, muted, olive-green rice for the [niri](https://yalter.github.io/niri/)
 scrollable-tiling Wayland compositor — with a live **Conway's Game of Life
-wallpaper**, an olive **tuigreet login screen**, and the whole desktop
-(bar, launcher, notifications, lock screen, terminal, GTK/Qt apps) pulled onto
+wallpaper**, a matching **Game of Life lock screen and login greeter**, and the
+whole desktop (bar, launcher, notifications, terminal, GTK/Qt apps) pulled onto
 one quiet palette.
 
 ## Screenshots
@@ -34,17 +34,18 @@ moves is the wallpaper.
 
 | Piece | What it does |
 |---|---|
-| `niri/config.kdl` | Full ready-to-run config: olive borders, dimmed unfocused windows, crisp animations, sane binds |
-| `lifewall/` | Conway's Game of Life as the wallpaper — a tiny Rust binary rendered through kitty's background panel at 30 fps, with fade-in births and dissolving deaths. Pause it (zero CPU) with `Mod+Shift+G`, reseed with `Mod+Ctrl+G`. Python fallback included if you don't have cargo. |
-| `waybar/` | Thin 26 px bar: workspaces, window title, clock, volume, battery, CPU/MEM |
+| `niri/config.kdl` | Full ready-to-run config: olive borders, dimmed unfocused windows, crisp animations, sane binds, floating-window snapping |
+| [lifewall](https://github.com/TheWhyteWolf/lifewall) | Conway's Game of Life as the wallpaper — a tiny Rust binary (cloned + built by `install.sh`) rendered through kitty's background panel at 30 fps, births fading in and deaths dissolving. Pause it (zero CPU) with `Mod+Shift+G`, reseed with `Mod+Ctrl+G`. Python fallback if you don't have cargo. |
+| [lifelock](https://github.com/TheWhyteWolf/lifegate) + swayidle | Game of Life cube lock screen; auto-lock at 10 min, screens off at 15, locks before sleep. swaylock stays as the `Mod+Shift+Alt+Escape` recovery fallback |
+| [lifegreet](https://github.com/TheWhyteWolf/lifegate) + greetd | Matching Game of Life login screen — the cube grows out of an olive username box (optional, separate installer; tuigreet fallback) |
+| `waybar/` | Thin 26 px bar, pure-text labels: workspaces, title, clock, DND, network, volume, battery, CPU/MEM. Volume/brightness keys flash a wob OSD |
 | `fuzzel/` | Launcher, clipboard history (`Mod+P`) and power menu (`Mod+Shift+E`), all matching |
-| `mako/` | Olive notifications |
-| `swaylock/` + swayidle | Olive lock screen; auto-lock at 10 min, screens off at 15, locks before sleep |
-| `greetd/` + tuigreet | Matching console login screen (optional, separate installer) |
-| `kitty/` | `rice.conf` (transparency + font, wired in automatically) and `olive.conf` (full opt-in colour theme) |
+| `mako/` | Olive notifications; do-not-disturb via `Mod+N` |
+| `kitty/` | `rice.conf` (transparency + font, wired in automatically) and `olive.conf` (full olive colour theme, on by default) |
 | `qt6ct/`, `xdg/`, GTK | Dark theme routing so Qt and GTK apps don't flashbang you |
 
-Font: [Cousine Nerd Font](https://www.nerdfonts.com/) everywhere.
+Font: [ShureTechMono Nerd Font](https://www.nerdfonts.com/) everywhere (Cousine
+kept as the install fallback).
 Cursor: [phinger-cursors](https://github.com/phisch/phinger-cursors) (light).
 
 ## Install
@@ -57,9 +58,11 @@ bash ~/niri-olivetree/install.sh
 ```
 
 The script installs packages, backs up any existing configs to `*.bak`,
-symlinks these configs into `~/.config`, builds the wallpaper, sets the GTK
-dark theme + cursor, and runs `niri validate`. Then log out and pick **Niri**
-at the login screen.
+symlinks these configs into `~/.config`, clones and builds the Game of Life
+binaries (the [lifewall](https://github.com/TheWhyteWolf/lifewall) wallpaper and
+the [lifelock](https://github.com/TheWhyteWolf/lifegate) locker) from their
+repos, installs lifelock's PAM file, sets the GTK dark theme + cursor, and runs
+`niri validate`. Then log out and pick **Niri** at the login screen.
 
 On other distros: install the equivalents of the package list at the top of
 `install.sh`, then run the script — the symlink/build steps are distro-agnostic
@@ -67,15 +70,20 @@ On other distros: install the equivalents of the package list at the top of
 
 ### The login screen (optional, deliberate)
 
-Replaces your display manager with greetd + an olive-themed
-[tuigreet](https://github.com/apognu/tuigreet):
+Replaces your display manager with greetd + **lifegreet** — the Game of Life
+cube greeter that matches the lock screen (built from the
+[lifegate](https://github.com/TheWhyteWolf/lifegate) repo). You type your
+username into a bare olive box, Enter grows the cube, and the password shows
+nothing but panel flares.
 
 ```sh
 bash ~/niri-olivetree/greeter-install.sh
 ```
 
-It backs up any existing greetd config, remembers your last user/session, and
-prints the exact rollback command for your old display manager when it's done.
+It builds lifegreet, installs the greetd config plus a memlock service drop-in,
+backs up any existing greetd config, and prints the rollback command when done.
+Cut over by rebooting. [tuigreet](https://github.com/apognu/tuigreet) stays
+installed as the fallback (`greetd/config-tuigreet.toml`).
 
 ## Keys worth knowing
 
@@ -85,8 +93,9 @@ prints the exact rollback command for your old display manager when it's done.
 | `Mod+T` | Terminal (kitty) |
 | `Mod+Grave` | Dropdown terminal (quake-style kitty in the top half) |
 | `Mod+P` | Clipboard history |
+| `Mod+N` | Do-not-disturb toggle |
 | `Mod+Shift+E` | Power menu (lock / suspend / logout / reboot / poweroff) |
-| `Mod+Alt+Escape` | Lock |
+| `Mod+Alt+Escape` | Lock (lifelock) |
 | `Mod+Alt+arrows` / `H/J/K/L` | Float snap: halves → quarters → max; back toward the middle restores |
 | `Mod+Alt+C` / `Mod+Alt+R` | Center / un-snap floating window |
 | `Mod+Shift+Ctrl+arrows` | Nudge floating window 40 px |
@@ -115,16 +124,16 @@ These need `jq` (in the package list).
 
 ## The wallpaper
 
-[`lifewall`](lifewall/) is a ~400 KB dependency-free Rust binary that runs
-Conway's Game of Life on a torus and interpolates every cell's colour each
-frame. When the board settles into still lifes for ~20 s it crossfades into a
-fresh random soup. It rides inside `kitten panel --edge=background`, so it
-behaves like any other layer-shell wallpaper. Terminals are 7% transparent so
-the life ghosts through them.
+[`lifewall`](https://github.com/TheWhyteWolf/lifewall) is a ~400 KB
+dependency-free Rust binary that runs Conway's Game of Life on a torus and
+interpolates every cell's colour each frame. When the board settles into still
+lifes for ~20 s it crossfades into a fresh random soup. It rides inside
+`kitten panel --edge=background`, so it behaves like any other layer-shell
+wallpaper. Terminals are 7% transparent so the life ghosts through them.
 
-Tick rate, colours, density and glyph are all flags — see
-[`lifewall/README.md`](lifewall/README.md), or preview it in any terminal by
-just running `lifebg`.
+Tick rate, colours, density and glyph are all flags — see the
+[lifewall repo](https://github.com/TheWhyteWolf/lifewall), or preview it in any
+terminal by just running `lifebg`.
 
 ## Uninstall
 
