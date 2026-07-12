@@ -87,7 +87,9 @@ spawn-at-startup "swaybg" "-c" "#121412"
 // --config NONE so it ignores kitty.conf (rice.conf transparency etc.).
 spawn-sh-at-startup "kitten panel --edge=background --config NONE -o font_size=8 -o font_family='ShureTechMono Nerd Font' -o background='#121412' ~/.local/bin/lifebg"
 // Idle chain: lock at 10 min, screens off at 15 min; lock before system sleep.
-spawn-at-startup "swayidle" "-w" "timeout" "600" "swaylock -f" "timeout" "900" "niri msg action power-off-monitors" "lock" "swaylock -f" "before-sleep" "swaylock -f"
+// lifelock is the Game of Life locker (built by install.sh); swaylock stays
+// installed as the Mod+Shift+Alt+Escape recovery fallback.
+spawn-at-startup "swayidle" "-w" "timeout" "600" "~/.local/bin/lifelock -f" "timeout" "900" "niri msg action power-off-monitors" "lock" "~/.local/bin/lifelock -f" "before-sleep" "~/.local/bin/lifelock -f"
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
 // Volume/brightness OSD: wob draws a bar for whatever percentage lands in its
@@ -154,9 +156,14 @@ binds {
     Mod+P      hotkey-overlay-title="Clipboard history"      { spawn-sh "~/.local/bin/clip-menu.sh"; }
     Mod+Grave  hotkey-overlay-title="Dropdown terminal"      { spawn-sh "~/.local/bin/scratch-term.sh"; }
 
-    // Screen lock (swayidle listens for the logind lock signal -> swaylock).
+    // Screen lock (swayidle listens for the logind lock signal -> lifelock).
     // On Mod+Alt+Escape to leave Mod+Alt+L free for the float-snap mirror.
     Mod+Alt+Escape { spawn "loginctl" "lock-session"; }
+
+    // Recovery escape hatch: spawn swaylock even while locked, in case lifelock
+    // ever wedges (niri shows a red "dead locker" screen). It takes over the
+    // orphaned lock so the session is always recoverable from the keyboard.
+    Mod+Shift+Alt+Escape allow-when-locked=true { spawn-sh "pkill -x -9 lifelock; sleep 1; swaylock -f"; }
 
     // --- Volume (vol-osd.sh = wpctl + a wob OSD bar flash) ---
     XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "~/.local/bin/vol-osd.sh up"; }

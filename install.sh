@@ -8,7 +8,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Official repos:
 PKGS=(niri kitty fuzzel waybar mako swaybg xwayland-satellite wl-clipboard cliphist jq wob
-      swaylock swayidle brightnessctl adw-gtk-theme
+      swaylock swayidle brightnessctl adw-gtk-theme git rust
       ttf-sharetech-mono-nerd ttf-cousine-nerd xdg-desktop-portal-gtk xdg-desktop-portal-gnome qt6ct)
 # AUR (cursor theme):
 AUR_PKGS=(phinger-cursors)
@@ -72,13 +72,44 @@ ln -sfn "$REPO/scripts/vol-osd.sh"       "$HOME/.local/bin/vol-osd.sh"
 ln -sfn "$REPO/scripts/bright-osd.sh"    "$HOME/.local/bin/bright-osd.sh"
 ln -sfn "$REPO/scripts/dnd-toggle.sh"    "$HOME/.local/bin/dnd-toggle.sh"
 
+# The Game of Life binaries are built from their own repos (the single source
+# of truth) rather than bundled here, so they never drift out of sync:
+#   lifewall  -> the wallpaper      (github.com/TheWhyteWolf/lifewall)
+#   lifegate  -> lifelock + lifegreet workspace (github.com/TheWhyteWolf/lifegate)
+SRC="${XDG_DATA_HOME:-$HOME/.local/share}/niri-olivetree/src"
+fetch() {  # fetch URL DIR — clone, or fast-forward if already cloned
+  if [[ -d "$2/.git" ]]; then
+    git -C "$2" pull --ff-only --quiet
+  else
+    mkdir -p "$(dirname "$2")"
+    git clone --quiet "$1" "$2"
+  fi
+}
+
 echo "==> Game of Life wallpaper (~/.local/bin/lifebg)"
 if command -v cargo >/dev/null 2>&1; then
-  (cd "$REPO/lifewall" && cargo build --release)
-  ln -sfn "$REPO/lifewall/target/release/lifewall" "$HOME/.local/bin/lifebg"
+  fetch https://github.com/TheWhyteWolf/lifewall.git "$SRC/lifewall"
+  (cd "$SRC/lifewall" && cargo build --release)
+  ln -sfn "$SRC/lifewall/target/release/lifewall" "$HOME/.local/bin/lifebg"
 else
   echo "    cargo not found — using the python fallback (scripts/life.py)"
   ln -sfn "$REPO/scripts/life.py" "$HOME/.local/bin/lifebg"
+fi
+
+# lifelock — the Game of Life lock screen (from the lifegate workspace).
+# swayidle in niri/config.kdl is wired to it; swaylock stays installed as the
+# recovery fallback behind Mod+Shift+Alt+Escape.
+echo "==> lifelock screen locker (~/.local/bin/lifelock)"
+if command -v cargo >/dev/null 2>&1; then
+  fetch https://github.com/TheWhyteWolf/lifegate.git "$SRC/lifegate"
+  (cd "$SRC/lifegate" && cargo build --release -p lifelock)
+  ln -sfn "$SRC/lifegate/target/release/lifelock" "$HOME/.local/bin/lifelock"
+  echo "    installing PAM service -> /etc/pam.d/lifelock"
+  sudo install -Dm644 "$SRC/lifegate/lifelock/pam/lifelock" /etc/pam.d/lifelock
+else
+  echo "    ERROR: cargo not found — swayidle is wired to lifelock and needs it."
+  echo "    Install rust, or point the swayidle line in niri/config.kdl back at swaylock -f."
+  exit 1
 fi
 
 echo "==> GTK dark theme + cursor (GTK apps; Qt follows qt6ct)"
@@ -98,12 +129,16 @@ cat <<'EOF'
     - Log out and pick "Niri" at the login screen (Mod = Super).
     - The Game of Life wallpaper starts with niri. Preview in a terminal: `lifebg`
       Pause/resume: Mod+Shift+G · fresh soup: Mod+Ctrl+G · flags: `lifebg --help`
-    - Lock: Mod+Alt+Escape (or 10 min idle); screens off at 15 min.
+    - Lock: Mod+Alt+Escape (or 10 min idle) -> lifelock, the Game of Life cube;
+      screens off at 15 min. swaylock stays as the Mod+Shift+Alt+Escape recovery
+      fallback if the locker ever wedges.
     - Float snap: Mod+Alt+arrows (or H/J/K/L) · dropdown terminal: Mod+Grave.
     - Volume/brightness keys flash a wob OSD bar · do-not-disturb: Mod+N.
     - Power menu: Mod+Shift+E · clipboard history: Mod+P · launcher: Mod+Space.
     - Restart kitty windows to pick up the transparency + font + olive palette
       (rice.conf now includes olive.conf).
-    - Optional olive login screen (replaces your display manager — deliberate step):
+    - Optional olive login screen: lifegreet, the Game of Life cube greeter that
+      matches the lock screen (replaces your display manager — deliberate step;
+      tuigreet stays wired as the fallback):
         bash greeter-install.sh
 EOF

@@ -1,13 +1,20 @@
 # greetd — console login manager (installed to /etc/greetd/config.toml by
-# greeter-install.sh). Runs tuigreet on vt1; sessions from wayland-sessions,
-# default niri-session, remembered per user.
+# greeter-install.sh). Runs lifegreet — the Game of Life greeter matching the
+# lifelock lock screen — inside the cage kiosk compositor on vt1.
 #
-# Theme is the olive rice mapped onto the VT's 16-colour palette (tuigreet
-# can't do hex): green = accent, gray = text, darkgray = border.
+# UX (by design): the username is typed into a bare olive box and must be
+# re-entered every login (no --remember). Enter grows the cube; the password
+# shows nothing but panel flares. F3 cycles sessions, Ctrl+Alt+Del reboots.
+#
+# Fallback to the tuigreet greeter (from a TTY, Ctrl+Alt+F3):
+#   sudo install -Dm644 ~/niri-olivetree/greetd/config-tuigreet.toml /etc/greetd/config.toml
+#   sudo systemctl restart greetd
 
 [terminal]
 vt = 1
 
 [default_session]
-command = "tuigreet --cmd niri-session --sessions /usr/share/wayland-sessions --remember --remember-user-session --asterisks --time --greeting 'niri-olivetree' --theme 'container=black;border=darkgray;title=green;greet=green;prompt=green;input=gray;text=gray;time=darkgray;action=gray;button=green' --power-shutdown 'systemctl poweroff' --power-reboot 'systemctl reboot'"
+# lifegreet-cage wipes vt1 (no cursor, no text — handoffs flash pure black)
+# then execs cage + lifegreet with output in the journal: journalctl -t lifegreet
+command = "/usr/local/bin/lifegreet-cage"
 user = "greeter"

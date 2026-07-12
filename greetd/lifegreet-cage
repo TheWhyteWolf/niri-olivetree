@@ -1,0 +1,15 @@
+#!/bin/sh
+# Greeter launcher (installed to /usr/local/bin/lifegreet-cage by
+# greeter-install.sh; greetd's [default_session] command).
+#
+# Keeps vt1's text buffer empty so the moments the text console becomes
+# visible (boot -> cage's first frame, cage -> session after auth, logout ->
+# greeter) flash pure black instead of terminal text:
+#   1. hide the console cursor, wipe screen + scrollback (stdout IS vt1 here)
+#   2. send cage/wlroots/lifegreet output to the journal instead of the VT
+#      (read it with: journalctl -t lifegreet)
+#
+# A separate script because greetd runs `exec <command>` through the shell —
+# a `printf ... && exec ...` chain in config.toml would die at the first exec.
+printf '\033[?25l\033[2J\033[3J\033[H'
+exec systemd-cat -t lifegreet -- cage -s -d -- /usr/local/bin/lifegreet
