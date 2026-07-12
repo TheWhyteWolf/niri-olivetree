@@ -83,9 +83,13 @@ prints the exact rollback command for your old display manager when it's done.
 |---|---|
 | `Mod+Space` / `Mod+Return` / `Mod+D` | Launcher (fuzzel) |
 | `Mod+T` | Terminal (kitty) |
+| `Mod+Grave` | Dropdown terminal (quake-style kitty in the top half) |
 | `Mod+P` | Clipboard history |
 | `Mod+Shift+E` | Power menu (lock / suspend / logout / reboot / poweroff) |
-| `Mod+Alt+L` | Lock |
+| `Mod+Alt+Escape` | Lock |
+| `Mod+Alt+arrows` / `H/J/K/L` | Float snap: halves → quarters → max; back toward the middle restores |
+| `Mod+Alt+C` / `Mod+Alt+R` | Center / un-snap floating window |
+| `Mod+Shift+Ctrl+arrows` | Nudge floating window 40 px |
 | `Mod+Shift+G` / `Mod+Ctrl+G` | Pause / reseed the Game of Life wallpaper |
 | `Mod+O` | Overview |
 | `Mod+Shift+/` | Full hotkey overlay |
@@ -93,6 +97,21 @@ prints the exact rollback command for your old display manager when it's done.
 Everything else follows niri's standard scheme — arrows/HJKL to focus,
 `+Ctrl` to move, numbers for workspaces, `Print` to screenshot. It's all in
 [`niri/config.kdl`](niri/config.kdl), which is commented for tweaking.
+
+### Floating windows
+
+`Mod+V` floats the focused window; then `Mod+Alt+arrows` (or `H/J/K/L`) snap it
+Windows-style (`scripts/float-snap.sh`): a first press takes a half, a second
+along the other axis refines to a corner quarter, `Mod+Alt+Up` from the top
+half maximizes — always with a 12 px margin matching the gaps. Pressing back
+toward the middle steps out and finally **restores the pre-snap geometry**;
+tiled windows auto-float on the first snap and return to tiling on restore.
+`Mod+Alt+C` centers, `Mod+Alt+R` un-snaps, `Mod+Shift+Ctrl+arrows` nudge, and
+`Mod+drag` / `Mod+right-drag` move / resize with the mouse (niri built-in).
+`Mod+Grave` toggles a quake-style dropdown kitty pinned to the top half
+(`scripts/scratch-term.sh`). Firefox picture-in-picture docks bottom-right, and
+pavucontrol / blueman / nm-connection-editor open floating at a sane size.
+These need `jq` (in the package list).
 
 ## The wallpaper
 

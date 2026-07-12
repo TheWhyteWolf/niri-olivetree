@@ -108,9 +108,31 @@ animations {
 
 // --- Window rules ---
 window-rule {
-    // Firefox picture-in-picture floats.
+    // Firefox picture-in-picture floats, docked to the bottom-right corner.
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
+    default-floating-position x=12 y=12 relative-to="bottom-right"
+}
+window-rule {
+    // Utility panels open floating at a sane size instead of as huge tiles
+    // (rules for apps that aren't installed are harmless).
+    match app-id=r#"^org\.pulseaudio\.pavucontrol$"#
+    match app-id=r#"^pavucontrol$"#
+    match app-id=r#"^nm-connection-editor$"#
+    match app-id=r#"^\.?blueman-manager(-wrapped)?$"#
+    open-floating true
+    default-column-width { fixed 720; }
+    default-window-height { fixed 540; }
+}
+window-rule {
+    // Dropdown terminal (Mod+Grave): floats in the top half. scratch-term.sh
+    // re-asserts the exact geometry via float-snap.sh on every summon, so the
+    // fixed size below is only the first-frame spawn size.
+    match app-id=r#"^scratchterm$"#
+    open-floating true
+    default-column-width { proportion 1.0; }
+    default-window-height { fixed 500; }
+    default-floating-position x=0 y=12 relative-to="top"
 }
 window-rule {
     // Dim unfocused windows slightly; makes the lime focus border pop.
@@ -127,9 +149,11 @@ binds {
     Mod+D      hotkey-overlay-title="Launcher: fuzzel"       { spawn "fuzzel"; }
     Mod+Space  hotkey-overlay-title="Launcher: fuzzel"       { spawn "fuzzel"; }
     Mod+P      hotkey-overlay-title="Clipboard history"      { spawn-sh "~/.local/bin/clip-menu.sh"; }
+    Mod+Grave  hotkey-overlay-title="Dropdown terminal"      { spawn-sh "~/.local/bin/scratch-term.sh"; }
 
     // Screen lock (swayidle listens for the logind lock signal -> swaylock).
-    Mod+Alt+L { spawn "loginctl" "lock-session"; }
+    // On Mod+Alt+Escape to leave Mod+Alt+L free for the float-snap mirror.
+    Mod+Alt+Escape { spawn "loginctl" "lock-session"; }
 
     // --- Volume ---
     XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05+ -l 1.0"; }
@@ -232,6 +256,33 @@ binds {
     Mod+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
     Mod+W       { toggle-column-tabbed-display; }
+
+    // --- Floating snap (float-snap.sh; Windows-style) ---
+    // Smart directional snap: halves -> quarters -> maximized-with-margins.
+    // Pressing back toward the middle steps out, ending in a restore of the
+    // pre-snap geometry; tiled windows auto-float and restore back to tiling.
+    // Free mouse control is niri built-in: Mod+drag moves, Mod+right-drag resizes.
+    Mod+Alt+Left  hotkey-overlay-title="Snap float left"  { spawn-sh "~/.local/bin/float-snap.sh left"; }
+    Mod+Alt+Down  hotkey-overlay-title="Snap float down"  { spawn-sh "~/.local/bin/float-snap.sh down"; }
+    Mod+Alt+Up    hotkey-overlay-title="Snap float up"    { spawn-sh "~/.local/bin/float-snap.sh up"; }
+    Mod+Alt+Right hotkey-overlay-title="Snap float right" { spawn-sh "~/.local/bin/float-snap.sh right"; }
+    Mod+Alt+H hotkey-overlay-title=null { spawn-sh "~/.local/bin/float-snap.sh left"; }
+    Mod+Alt+J hotkey-overlay-title=null { spawn-sh "~/.local/bin/float-snap.sh down"; }
+    Mod+Alt+K hotkey-overlay-title=null { spawn-sh "~/.local/bin/float-snap.sh up"; }
+    Mod+Alt+L hotkey-overlay-title=null { spawn-sh "~/.local/bin/float-snap.sh right"; }
+    Mod+Alt+C hotkey-overlay-title="Center float"  { spawn-sh "~/.local/bin/float-snap.sh center"; }
+    Mod+Alt+R hotkey-overlay-title="Un-snap float" { spawn-sh "~/.local/bin/float-snap.sh restore"; }
+
+    // Nudge floats 40px (move-floating-window is IPC-only in niri, so these
+    // spawn niri msg instead of binding the action directly).
+    Mod+Shift+Ctrl+Left  hotkey-overlay-title="Nudge float left"  { spawn-sh "niri msg action move-floating-window -x -40"; }
+    Mod+Shift+Ctrl+Down  hotkey-overlay-title="Nudge float down"  { spawn-sh "niri msg action move-floating-window -y +40"; }
+    Mod+Shift+Ctrl+Up    hotkey-overlay-title="Nudge float up"    { spawn-sh "niri msg action move-floating-window -y -40"; }
+    Mod+Shift+Ctrl+Right hotkey-overlay-title="Nudge float right" { spawn-sh "niri msg action move-floating-window -x +40"; }
+    Mod+Shift+Ctrl+H hotkey-overlay-title=null { spawn-sh "niri msg action move-floating-window -x -40"; }
+    Mod+Shift+Ctrl+J hotkey-overlay-title=null { spawn-sh "niri msg action move-floating-window -y +40"; }
+    Mod+Shift+Ctrl+K hotkey-overlay-title=null { spawn-sh "niri msg action move-floating-window -y -40"; }
+    Mod+Shift+Ctrl+L hotkey-overlay-title=null { spawn-sh "niri msg action move-floating-window -x +40"; }
 
     // --- Screenshots ---
     Print      { screenshot; }

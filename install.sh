@@ -7,7 +7,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Official repos:
-PKGS=(niri kitty fuzzel waybar mako swaybg xwayland-satellite wl-clipboard cliphist
+PKGS=(niri kitty fuzzel waybar mako swaybg xwayland-satellite wl-clipboard cliphist jq
       swaylock swayidle brightnessctl adw-gtk-theme
       ttf-cousine-nerd xdg-desktop-portal-gtk xdg-desktop-portal-gnome qt6ct)
 # AUR (cursor theme):
@@ -57,11 +57,14 @@ fi
 
 echo "==> Installing scripts into ~/.local/bin"
 chmod +x "$REPO/scripts/clip-menu.sh" "$REPO/scripts/life.py" \
-         "$REPO/scripts/power-menu.sh" "$REPO/scripts/lifebg-toggle.sh"
+         "$REPO/scripts/power-menu.sh" "$REPO/scripts/lifebg-toggle.sh" \
+         "$REPO/scripts/float-snap.sh" "$REPO/scripts/scratch-term.sh"
 mkdir -p "$HOME/.local/bin"
 ln -sfn "$REPO/scripts/clip-menu.sh"     "$HOME/.local/bin/clip-menu.sh"
 ln -sfn "$REPO/scripts/power-menu.sh"    "$HOME/.local/bin/power-menu.sh"
 ln -sfn "$REPO/scripts/lifebg-toggle.sh" "$HOME/.local/bin/lifebg-toggle.sh"
+ln -sfn "$REPO/scripts/float-snap.sh"    "$HOME/.local/bin/float-snap.sh"
+ln -sfn "$REPO/scripts/scratch-term.sh"  "$HOME/.local/bin/scratch-term.sh"
 
 echo "==> Game of Life wallpaper (~/.local/bin/lifebg)"
 if command -v cargo >/dev/null 2>&1; then
@@ -89,7 +92,8 @@ cat <<'EOF'
     - Log out and pick "Niri" at the login screen (Mod = Super).
     - The Game of Life wallpaper starts with niri. Preview in a terminal: `lifebg`
       Pause/resume: Mod+Shift+G · fresh soup: Mod+Ctrl+G · flags: `lifebg --help`
-    - Lock: Mod+Alt+L (or 10 min idle); screens off at 15 min.
+    - Lock: Mod+Alt+Escape (or 10 min idle); screens off at 15 min.
+    - Float snap: Mod+Alt+arrows (or H/J/K/L) · dropdown terminal: Mod+Grave.
     - Power menu: Mod+Shift+E · clipboard history: Mod+P · launcher: Mod+Space.
     - Restart kitty windows to pick up the transparency + font (rice.conf).
     - Kitty olive colours are opt-in: `kitty -c ~/.config/kitty/olive.conf` to
