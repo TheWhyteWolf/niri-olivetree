@@ -16,6 +16,23 @@ olive `#` glyphs, under the 26 px bar.*
 *At work: shell, file manager and [termusic](https://github.com/tramhao/termusic)
 in kitty panes, with the colonies ghosting through the 7% transparency.*
 
+![Desktop — fastfetch over the wallpaper](assets/desktop.png)
+*System at a glance: fastfetch over the colonies, everything on the olive palette.*
+
+The rest of the setup:
+
+| | |
+|---|---|
+| ![Lock screen](assets/lifelock.png) | ![Login greeter](assets/lifegreet.png) |
+| **lifelock** — the isometric Game of Life cube; a keystroke flares a panel lime. | **lifegreet** — the same cube grows out of an olive username box at login. |
+| ![Float snapping](assets/floatsnap.png) | ![Dropdown terminal](assets/dropdown.png) |
+| `Mod+Alt+arrows` snap floats to quarters → halves → max, with 12 px gaps. | `Mod+Grave` drops a quake-style kitty into the top half. |
+| ![Launcher](assets/fuzzel.png) | ![Notification](assets/mako.png) |
+| fuzzel, pure-text, no icons. | mako notifications in the olive panel. |
+
+![The waybar](assets/waybar.png)
+*The 26 px bar: workspaces · title · clock · DND · NET · VOL · CPU · MEM — labels, no glyphs.*
+
 ## Palette
 
 | Role | Hex | |
